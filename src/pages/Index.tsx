@@ -262,13 +262,12 @@ const Index = () => {
         <div className="mx-auto max-w-3xl text-center">
           <Quote className="mx-auto mb-6 h-12 w-12 text-primary/30" />
           <blockquote className="font-serif text-2xl italic text-foreground md:text-3xl">
-            "Saya tidak menyangka ada yang peduli. Dengan bantuan ini, saya bisa
-            beli gerobak baru setelah yang lama rusak. Terima kasih Solo."
+            "Terimakasih sobat PHS. Berkat video Tiktok yang viral, saya bisa lebih dikenal oleh masyarakat setempat."
           </blockquote>
           <div className="mt-6">
-            <p className="font-semibold text-foreground">Pak Darmo</p>
+            <p className="font-semibold text-foreground">Bu Sri</p>
             <p className="text-sm text-muted-foreground">
-              Penjual Nasi Goreng, Jl. Slamet Riyadi
+              Penjual Tape Ketan - Jembatan Tipes
             </p>
           </div>
         </div>
