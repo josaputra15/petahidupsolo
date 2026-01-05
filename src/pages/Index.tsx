@@ -135,7 +135,7 @@ const Index = () => {
 
         {/* Stats */}
         <div className="container relative mx-auto mt-16 px-4">
-          <div className="mx-auto grid max-w-3xl grid-cols-3 gap-4 md:gap-8">
+          <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 md:gap-8">
             <div className="text-center">
               <p className="font-serif text-3xl font-bold text-primary md:text-4xl">
                 {vendors.length}+
@@ -152,14 +152,14 @@ const Index = () => {
                 Kecamatan Terjangkau
               </p>
             </div>
-            <div className="text-center">
+            {/* <div className="text-center">
               <p className="font-serif text-3xl font-bold text-primary md:text-4xl">
                 Rp 2.5jt
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Donasi Terkumpul
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
