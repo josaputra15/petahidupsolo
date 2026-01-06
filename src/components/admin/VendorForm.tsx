@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,7 @@ const VendorForm = ({ vendor, onSubmit, onCancel }: VendorFormProps) => {
   const [photos, setPhotos] = useState<string[]>(vendor?.photos || []);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -60,6 +61,10 @@ const VendorForm = ({ vendor, onSubmit, onCancel }: VendorFormProps) => {
 
   const removePhoto = (index: number) => {
     setPhotos(photos.filter((_, i) => i !== index));
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -229,20 +234,25 @@ const VendorForm = ({ vendor, onSubmit, onCancel }: VendorFormProps) => {
         <Label>Foto</Label>
         <div className="mt-2 space-y-4">
           <div className="flex items-center gap-4">
-            <label className="cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                className="hidden"
-                disabled={uploading}
-              />
-              <Button type="button" variant="outline" className="gap-2" disabled={uploading}>
-                <Upload className="h-4 w-4" />
-                {uploading ? "Mengupload..." : "Upload Foto"}
-              </Button>
-            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className="hidden"
+              disabled={uploading}
+            />
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="gap-2" 
+              disabled={uploading}
+              onClick={handleUploadClick}
+            >
+              <Upload className="h-4 w-4" />
+              {uploading ? "Mengupload..." : "Upload Foto"}
+            </Button>
           </div>
 
           {photos.length > 0 && (
