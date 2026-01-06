@@ -13,7 +13,18 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import MapView from "@/components/MapView";
-import { vendors, searchVendors, type Vendor } from "@/data/vendors";
+import { useVendors } from "@/hooks/useVendors";
+import type { Vendor } from "@/data/vendors";
+
+// Search function that works with any vendor array
+const searchVendors = (vendors: Vendor[], query: string): Vendor[] => {
+  const lowerQuery = query.toLowerCase();
+  return vendors.filter(v => 
+    v.name.toLowerCase().includes(lowerQuery) ||
+    v.sells.some(s => s.toLowerCase().includes(lowerQuery)) ||
+    v.location.addressText.toLowerCase().includes(lowerQuery)
+  );
+};
 
 const categories = [
   { value: "semua", label: "Semua" },
@@ -23,19 +34,20 @@ const categories = [
 ];
 
 const Peta = () => {
+  const { data: vendors = [], isLoading } = useVendors();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("semua");
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
 
   const filteredVendors = useMemo(() => {
-    let result = searchQuery ? searchVendors(searchQuery) : vendors;
+    let result = searchQuery ? searchVendors(vendors, searchQuery) : vendors;
 
     if (selectedCategory !== "semua") {
       result = result.filter((v) => v.vendorType === selectedCategory);
     }
 
     return result;
-  }, [searchQuery, selectedCategory]);
+  }, [vendors, searchQuery, selectedCategory]);
 
   const handleVendorClick = (vendor: Vendor) => {
     setSelectedVendor(vendor);
@@ -48,6 +60,26 @@ const Peta = () => {
 
   const hasActiveFilters =
     searchQuery || selectedCategory !== "semua";
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-[calc(100vh-4rem)] flex-col">
+        <div className="border-b border-border bg-card px-4 py-4">
+          <div className="container mx-auto">
+            <h1 className="font-serif text-2xl font-bold text-foreground md:text-3xl">
+              Peta Pedagang Solo
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Temukan dan dukung pedagang kecil di sekitarmu
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-muted-foreground">Memuat...</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-[calc(100vh-4rem)] flex-col">

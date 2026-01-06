@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Section, SectionHeader } from "@/components/Section";
 import VendorCard from "@/components/VendorCard";
-import { vendors } from "@/data/vendors";
+import { useVendors } from "@/hooks/useVendors";
 import backgroundImage1 from "@/components/pictures/petahidupsolosampul.png";
 import backgroundImage2 from "@/components/pictures/petahidupsolobackground2.png";
 
 const Index = () => {
+  const { data: vendors = [], isLoading } = useVendors();
   const latestVendors = vendors.slice(0, 6);
   
   // Array of background images - easy to add more later
@@ -138,7 +139,7 @@ const Index = () => {
           <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 md:gap-8">
             <div className="text-center">
               <p className="font-serif text-3xl font-bold text-primary md:text-4xl">
-                {vendors.length}+
+                {isLoading ? "..." : `${vendors.length}+`}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Pedagang Terdaftar
@@ -242,11 +243,17 @@ const Index = () => {
           title="Kenali mereka"
           subtitle="Pedagang-pedagang yang sudah kami petakan. Setiap wajah punya kisah."
         />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {latestVendors.map((vendor) => (
-            <VendorCard key={vendor.id} vendor={vendor} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="py-12 text-center text-muted-foreground">
+            Memuat...
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {latestVendors.map((vendor) => (
+              <VendorCard key={vendor.id} vendor={vendor} />
+            ))}
+          </div>
+        )}
         <div className="mt-10 text-center">
           <Button asChild variant="outline" size="lg" className="gap-2">
             <Link to="/peta">

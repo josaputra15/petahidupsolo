@@ -6,15 +6,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Section, SectionHeader } from "@/components/Section";
 import MapView from "@/components/MapView";
 import VendorCard from "@/components/VendorCard";
-import { getVendorBySlug, getRelatedVendors } from "@/data/vendors";
+import { useVendorBySlug, useVendors } from "@/hooks/useVendors";
 import { useToast } from "@/hooks/use-toast";
 
 const PedagangProfile = () => {
   const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
+  const { data: vendor, isLoading: isLoadingVendor } = useVendorBySlug(slug || "");
+  const { data: allVendors = [] } = useVendors();
   
-  const vendor = slug ? getVendorBySlug(slug) : undefined;
-  const relatedVendors = slug ? getRelatedVendors(slug, 3) : [];
+  // Get related vendors (exclude current vendor)
+  const relatedVendors = slug 
+    ? allVendors.filter(v => v.slug !== slug).slice(0, 3)
+    : [];
+
+  if (isLoadingVendor) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground">Memuat...</div>
+      </div>
+    );
+  }
 
   if (!vendor) {
     return <Navigate to="/peta" replace />;
