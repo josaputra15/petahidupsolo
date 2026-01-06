@@ -21,24 +21,59 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/peta" element={<Peta />} />
-            <Route path="/dukung" element={<Dukung />} />
-            <Route path="/pedagang/:slug" element={<PedagangProfile />} />
-            <Route path="/admin/login" element={<Login />} />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          {/* Admin routes - no layout */}
+          <Route path="/admin/login" element={<Login />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          {/* Public routes - with layout */}
+          <Route
+            path="/"
+            element={
+              <Layout>
+                <Index />
+              </Layout>
+            }
+          />
+          <Route
+            path="/peta"
+            element={
+              <Layout>
+                <Peta />
+              </Layout>
+            }
+          />
+          <Route
+            path="/dukung"
+            element={
+              <Layout>
+                <Dukung />
+              </Layout>
+            }
+          />
+          <Route
+            path="/pedagang/:slug"
+            element={
+              <Layout>
+                <PedagangProfile />
+              </Layout>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <Layout>
+                <NotFound />
+              </Layout>
+            }
+          />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
