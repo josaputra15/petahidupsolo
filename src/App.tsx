@@ -9,6 +9,9 @@ import Peta from "./pages/Peta";
 import Dukung from "./pages/Dukung";
 import PedagangProfile from "./pages/PedagangProfile";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/admin/Login";
+import Dashboard from "./pages/admin/Dashboard";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +27,15 @@ const App = () => (
             <Route path="/peta" element={<Peta />} />
             <Route path="/dukung" element={<Dukung />} />
             <Route path="/pedagang/:slug" element={<PedagangProfile />} />
+            <Route path="/admin/login" element={<Login />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
