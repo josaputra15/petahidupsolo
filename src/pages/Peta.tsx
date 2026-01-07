@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Filter, X, MapPin } from "lucide-react";
+import { Search, Filter, X, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,11 +33,14 @@ const categories = [
   { value: "jasa", label: "Jasa" },
 ];
 
+const VENDORS_PER_PAGE = 10;
+
 const Peta = () => {
   const { data: vendors = [], isLoading } = useVendors();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("semua");
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredVendors = useMemo(() => {
     let result = searchQuery ? searchVendors(vendors, searchQuery) : vendors;
@@ -48,6 +51,17 @@ const Peta = () => {
 
     return result;
   }, [vendors, searchQuery, selectedCategory]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredVendors.length / VENDORS_PER_PAGE);
+  const startIndex = (currentPage - 1) * VENDORS_PER_PAGE;
+  const endIndex = startIndex + VENDORS_PER_PAGE;
+  const paginatedVendors = filteredVendors.slice(startIndex, endIndex);
 
   const handleVendorClick = (vendor: Vendor) => {
     setSelectedVendor(vendor);
@@ -198,62 +212,125 @@ const Peta = () => {
         </div>
 
         {/* Vendor List */}
-        <div className="w-full overflow-y-auto border-t border-border bg-card p-4 md:order-1 md:w-96 md:border-r md:border-t-0">
-          <div className="space-y-3">
-            {filteredVendors.map((vendor) => (
-              <Card
-                key={vendor.id}
-                className={`cursor-pointer transition-all hover:shadow-md ${
-                  selectedVendor?.id === vendor.id
-                    ? "ring-2 ring-primary"
-                    : ""
-                }`}
-                onClick={() => handleVendorClick(vendor)}
-              >
-                <CardContent className="flex gap-3 p-3">
-                  <img
-                    src={vendor.photos[0]}
-                    alt={vendor.name}
-                    className="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-serif font-semibold text-foreground truncate">
-                        {vendor.name}
-                      </h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {vendor.sells.slice(0, 2).join(", ")}
-                    </p>
-                    <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3" />
-                      <span className="truncate">{vendor.location.addressText}</span>
-                    </div>
-                    <Button
-                      asChild
-                      variant="link"
-                      size="sm"
-                      className="mt-1 h-auto p-0 text-primary"
-                    >
-                      <Link to={`/pedagang/${vendor.slug}`}>Lihat Profil →</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            {filteredVendors.length === 0 && (
-              <div className="py-8 text-center text-muted-foreground">
-                <p>Tidak ada pedagang yang cocok dengan filter.</p>
-                <Button
-                  variant="link"
-                  onClick={clearFilters}
-                  className="mt-2"
+        <div className="flex w-full flex-col border-t border-border bg-card md:order-1 md:w-96 md:border-r md:border-t-0">
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="space-y-3">
+              {paginatedVendors.map((vendor) => (
+                <Card
+                  key={vendor.id}
+                  className={`cursor-pointer transition-all hover:shadow-md ${
+                    selectedVendor?.id === vendor.id
+                      ? "ring-2 ring-primary"
+                      : ""
+                  }`}
+                  onClick={() => handleVendorClick(vendor)}
                 >
-                  Reset filter
-                </Button>
-              </div>
-            )}
+                  <CardContent className="flex gap-3 p-3">
+                    <img
+                      src={vendor.photos[0]}
+                      alt={vendor.name}
+                      className="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-serif font-semibold text-foreground truncate">
+                          {vendor.name}
+                        </h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {vendor.sells.slice(0, 2).join(", ")}
+                      </p>
+                      <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3" />
+                        <span className="truncate">{vendor.location.addressText}</span>
+                      </div>
+                      <Button
+                        asChild
+                        variant="link"
+                        size="sm"
+                        className="mt-1 h-auto p-0 text-primary"
+                      >
+                        <Link to={`/pedagang/${vendor.slug}`}>Lihat Profil →</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {filteredVendors.length === 0 && (
+                <div className="py-8 text-center text-muted-foreground">
+                  <p>Tidak ada pedagang yang cocok dengan filter.</p>
+                  <Button
+                    variant="link"
+                    onClick={clearFilters}
+                    className="mt-2"
+                  >
+                    Reset filter
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Pagination Controls */}
+          {filteredVendors.length > VENDORS_PER_PAGE && (
+            <div className="border-t border-border p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  Menampilkan {startIndex + 1}-{Math.min(endIndex, filteredVendors.length)} dari {filteredVendors.length}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      // Show first page, last page, current page, and pages around current
+                      if (
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <Button
+                            key={page}
+                            variant={currentPage === page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setCurrentPage(page)}
+                            className="min-w-[2rem]"
+                          >
+                            {page}
+                          </Button>
+                        );
+                      } else if (
+                        page === currentPage - 2 ||
+                        page === currentPage + 2
+                      ) {
+                        return (
+                          <span key={page} className="px-2 text-muted-foreground">
+                            ...
+                          </span>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </main>
